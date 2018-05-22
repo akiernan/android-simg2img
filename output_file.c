@@ -499,25 +499,28 @@ static int write_normal_data_chunk(struct output_file *out, unsigned int len, vo
 
 static int write_normal_fill_chunk(struct output_file *out, unsigned int len, uint32_t fill_val)
 {
-    int ret;
-    unsigned int i;
-    unsigned int write_len;
+    if (fill_val == 0) {
+        return out->ops->skip(out, len);
+    } else {
+        int ret;
+        unsigned int i;
+        unsigned int write_len;
 
-    /* Initialize fill_buf with the fill_val */
-    for (i = 0; i < out->block_size / sizeof(uint32_t); i++) {
-        out->fill_buf[i] = fill_val;
-    }
-
-    while (len) {
-        write_len = min(len, out->block_size);
-        ret = out->ops->write(out, out->fill_buf, write_len);
-        if (ret < 0) {
-            return ret;
+        /* Initialize fill_buf with the fill_val */
+        for (i = 0; i < out->block_size / sizeof(uint32_t); i++) {
+            out->fill_buf[i] = fill_val;
         }
 
-        len -= write_len;
-    }
+        while (len) {
+            write_len = min(len, out->block_size);
+            ret = out->ops->write(out, out->fill_buf, write_len);
+            if (ret < 0) {
+                return ret;
+            }
 
+            len -= write_len;
+        }
+    }
     return 0;
 }
 
