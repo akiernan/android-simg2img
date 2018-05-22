@@ -36,7 +36,8 @@ LIB_SRCS = \
 LIB_OBJS = $(LIB_SRCS:%.c=%.o)
 LIB_INCS = -Iinclude
 
-LDFLAGS += -L. -l$(LIB_NAME) -lm -lz
+LDFLAGS += -L. -l$(LIB_NAME) -lm
+# -lz
 
 BINS = simg2img simg2simg img2simg append2simg
 HEADERS = include/sparse/sparse.h

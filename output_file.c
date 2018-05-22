@@ -27,7 +27,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#ifdef WITH_GZ
 #include <zlib.h>
+#endif
 
 #include "defs.h"
 #include "output_file.h"
@@ -88,6 +90,7 @@ struct output_file {
     char *buf;
 };
 
+#ifdef WITH_GZ
 struct output_file_gz {
     struct output_file out;
     gzFile gz_fd;
@@ -95,6 +98,7 @@ struct output_file_gz {
 
 #define to_output_file_gz(_o) \
 	container_of((_o), struct output_file_gz, out)
+#endif
 
 struct output_file_normal {
     struct output_file out;
@@ -184,6 +188,7 @@ static struct output_file_ops file_ops = {
     .close = file_close,
 };
 
+#ifdef WITH_GZ
 static int gz_file_open(struct output_file *out, int fd)
 {
     struct output_file_gz *outgz = to_output_file_gz(out);
@@ -268,6 +273,7 @@ static struct output_file_ops gz_file_ops = {
     .write = gz_file_write,
     .close = gz_file_close,
 };
+#endif
 
 static int callback_file_open(struct output_file *out __unused, int fd __unused)
 {
@@ -601,6 +607,7 @@ static int output_file_init(struct output_file *out, int block_size,
     return ret;
 }
 
+#ifdef WITH_GZ
 static struct output_file *output_file_new_gz(void)
 {
     struct output_file_gz *outgz = calloc(1, sizeof(struct output_file_gz));
@@ -613,6 +620,7 @@ static struct output_file *output_file_new_gz(void)
 
     return &outgz->out;
 }
+#endif
 
 static struct output_file *output_file_new_normal(void)
 {
@@ -659,11 +667,15 @@ struct output_file *output_file_open_fd(int fd, unsigned int block_size, int64_t
     int ret;
     struct output_file *out;
 
+#ifdef WITH_GZ
     if (gz) {
         out = output_file_new_gz();
     } else {
         out = output_file_new_normal();
     }
+#else
+    out = output_file_new_normal();
+#endif
     if (!out) {
         return NULL;
     }
