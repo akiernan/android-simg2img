@@ -15,12 +15,12 @@
 #
 PREFIX  ?= /usr/local
 
-CC      ?= gcc
-LD      ?= gcc
-DEP_CC  ?= gcc
-AR      ?= ar
-RANLIB  ?= ranlib
-STRIP   ?= strip
+CC      = $(CROSS_COMPILE)gcc
+LD      = $(CROSS_COMPILE)gcc
+DEP_CC  = $(CROSS_COMPILE)gcc
+AR      = $(CROSS_COMPILE)ar
+RANLIB  = $(CROSS_COMPILE)ranlib
+STRIP   = $(CROSS_COMPILE)strip
 CFLAGS  += -O2 -Wall -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE=1
 
 # libsparse
